@@ -182,7 +182,22 @@
   };
   
   programs.light.enable = true;
+  services.flatpak.enable = true;
+
   
+  environment.sessionVariables = {
+  XDG_DATA_DIRS = [
+    "/var/lib/flatpak/exports/share"
+    "$HOME/.local/share/flatpak/exports/share"
+  ];
+};
+
+  programs.ssh.extraConfig = ''
+  Host github.com
+      HostName github.com
+      User git
+      IdentitiesOnly yes
+'';
 
 
 }
