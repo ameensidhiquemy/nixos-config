@@ -46,8 +46,8 @@
   services.xserver.enable = true;
 
   # Enable the GNOME Desktop Environment.
-  services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = true;
+  #services.xserver.displayManager.gdm.enable = true;
+  #services.xserver.desktopManager.gnome.enable = true;
 
   # Configure keymap in X11
   services.xserver.xkb = {
@@ -58,6 +58,27 @@
   # Enable CUPS to print documents.
   services.printing.enable = true;
   services.gnome.gnome-browser-connector.enable = true;
+  
+  #cosmic DE add
+services = {
+  displayManager = {
+    cosmic-greeter.enable = true;
+  };
+  desktopManager = {
+    cosmic.enable = true;
+  };
+};
+
+
+#for wayland support
+xdg.portal = {
+  enable = true;
+  extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+};
+
+# Enable Wayland support
+programs.wayland.enable = true;
+
 
   # Enable sound with pipewire.
   services.pulseaudio.enable = false;
@@ -100,8 +121,8 @@
   environment.systemPackages = with pkgs; [
   #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
   #  wget
-    gnome-system-monitor
-    nautilus
+    #gnome-system-monitor
+    #nautilus
     dconf-editor
 
 
@@ -120,6 +141,7 @@
     vscode
     rar
     yandex-music
+    solaar
 
     grim # screenshot functionality
     slurp # screenshot functionality
@@ -135,6 +157,14 @@
     emacs
     ripgrep
     fd
+    cosmic-greeter
+    cosmic-settings
+    cosmic-session
+    cosmic-workspaces
+    cosmic-launcher
+    cosmic-notifications
+    cosmic-panel
+    cosmic-term
 
     
     
@@ -142,6 +172,13 @@
 
 
   ];
+  
+  
+  services.udev.packages = with pkgs; [
+  solaar
+];
+
+services.solaar.enable = true;
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -177,10 +214,10 @@
   
   services.gnome.gnome-keyring.enable = true;
   # enable sway window manager
-  programs.sway = {
-    enable = true;
-    wrapperFeatures.gtk = true;
-  };
+  #programs.sway = {
+  #  enable = true;
+  #  wrapperFeatures.gtk = true;
+  #};
   
 programs.light.enable = true;
 
@@ -215,17 +252,6 @@ environment.etc."gdm/custom.conf".text = pkgs.lib.mkForce ''
   DisallowTCP=true
 '';
 
-  # 2. Set a password for the root user if you haven't already.
-  # You'll need to know the root password to log in.
-  # If you don't have one, NixOS won't set it by default.
-  # You can set it *after* the rebuild using `sudo passwd root`.
-  # Or, if you want to set it declaratively (less common for root, more for initial setup):
-  #users.users.root.initialHashedPassword = "0110"; # REPLACE THIS
-  # To generate a hash: `nix-shell -p mkpasswd --run 'mkpasswd -m sha-512'` and enter your password.
-  # Then copy the output into the quotes.
-  # If you omit this, you must run `sudo passwd root` from your 'ameen' user after `nixos-rebuild switch`.
-
-  # >>> END OF CHANGES FOR ROOT LOGIN <<<
 
 }
 
