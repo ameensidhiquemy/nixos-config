@@ -132,6 +132,10 @@
     discord
     flatpak
     git
+    emacs
+    ripgrep
+    fd
+
     
     
 
