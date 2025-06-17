@@ -102,11 +102,8 @@
   #  wget
     gnome-system-monitor
     nautilus
-    gnomeExtensions.night-theme-switcher
-    gnomeExtensions.emoji-copy
-    gnomeExtensions.brightness-control-using-ddcutil
-    gnome-browser-connector  
-    gnome-extension-manager
+    dconf-editor
+
 
     
     vivaldi
@@ -172,7 +169,7 @@
   #CUSTOM MINE START
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   
-  nixpkgs.config.firefox.enableGnomeExtensions = true;
+  #nixpkgs.config.firefox.enableGnomeExtensions = true;
   
   services.gnome.gnome-keyring.enable = true;
   # enable sway window manager
@@ -181,16 +178,10 @@
     wrapperFeatures.gtk = true;
   };
   
-  programs.light.enable = true;
-  services.flatpak.enable = true;
+programs.light.enable = true;
 
-  
-  environment.sessionVariables = {
-  XDG_DATA_DIRS = [
-    "/var/lib/flatpak/exports/share"
-    "$HOME/.local/share/flatpak/exports/share"
-  ];
-};
+
+security.polkit.enable = true;
 
   programs.ssh.extraConfig = ''
   Host github.com
@@ -200,4 +191,38 @@
 '';
 
 
+  # >>> START OF CHANGES FOR ROOT LOGIN <<<
+
+  # CRITICAL SECURITY WARNING: Allowing direct root graphical login is EXTREMELY DANGEROUS.
+  # Do not do this on any system that is exposed to untrusted users or networks.
+
+  # 1. Enable root login for GDM
+  # This often involves overriding GDM's default configuration which prevents root login.
+  # GDM's configuration is managed by NixOS, and we need to modify the settings that
+  # prevent root from logging in graphically.
+  # The `AllowRoot` setting in /etc/gdm/custom.conf (or similar) needs to be set to true.
+  # NixOS's declarative way to do this is via `services.xserver.displayManager.gdm.extraConfig`.
+environment.etc."gdm/custom.conf".text = pkgs.lib.mkForce ''
+  # GDM configuration for root login (Added by NixOS configuration)
+  [daemon]
+  AllowRoot=true
+
+  [security]
+  DisallowTCP=true
+'';
+
+  # 2. Set a password for the root user if you haven't already.
+  # You'll need to know the root password to log in.
+  # If you don't have one, NixOS won't set it by default.
+  # You can set it *after* the rebuild using `sudo passwd root`.
+  # Or, if you want to set it declaratively (less common for root, more for initial setup):
+  #users.users.root.initialHashedPassword = "0110"; # REPLACE THIS
+  # To generate a hash: `nix-shell -p mkpasswd --run 'mkpasswd -m sha-512'` and enter your password.
+  # Then copy the output into the quotes.
+  # If you omit this, you must run `sudo passwd root` from your 'ameen' user after `nixos-rebuild switch`.
+
+  # >>> END OF CHANGES FOR ROOT LOGIN <<<
+
 }
+
+
