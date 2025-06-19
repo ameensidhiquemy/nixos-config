@@ -45,9 +45,13 @@
   # Enable the X11 windowing system.
   services.xserver.enable = true;
 
-  # Enable the GNOME Desktop Environment.
-  #services.xserver.displayManager.gdm.enable = true;
-  #services.xserver.desktopManager.gnome.enable = true;
+  # --- MODIFIED: Enable Plasma and use SDDM as the Display Manager ---
+  services.xserver.displayManager.sddm.enable = true;
+
+  services.desktopManager = {
+    cosmic.enable = true;
+    plasma.enable = true; # Added KDE Plasma
+  };
 
   # Configure keymap in X11
   services.xserver.xkb = {
@@ -57,28 +61,18 @@
 
   # Enable CUPS to print documents.
   services.printing.enable = true;
-  services.gnome.gnome-browser-connector.enable = true;
-  
-  #cosmic DE add
-services = {
-  displayManager = {
-    cosmic-greeter.enable = true;
+  services.gnome.gnome-browser-connector.enable = true; # This is fine to keep
+
+  # --- MODIFIED: Added KDE portal for better integration ---
+  xdg.portal = {
+    enable = true;
+    extraPortals = [
+      pkgs.xdg-desktop-portal-gtk
+      pkgs.xdg-desktop-portal-gnome
+      pkgs.xdg-desktop-portal-kde # Added for KDE
+    ];
+    config.common.default = [ "*" ];
   };
-  desktopManager = {
-    cosmic.enable = true;
-  };
-};
-
-
-#for wayland support
-xdg.portal = {
-  enable = true;
-  extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
-};
-
-# Enable Wayland support
-programs.wayland.enable = true;
-
 
   # Enable sound with pipewire.
   services.pulseaudio.enable = false;
@@ -88,16 +82,8 @@ programs.wayland.enable = true;
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
-    # If you want to use JACK applications, uncomment this
     #jack.enable = true;
-
-    # use the example session manager (no others are packaged yet so this is enabled by default,
-    # no need to redefine it in your config for now)
-    #media-session.enable = true;
   };
-
-  # Enable touchpad support (enabled default in most desktopManager).
-  # services.xserver.libinput.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.ameen = {
@@ -106,7 +92,6 @@ programs.wayland.enable = true;
     extraGroups = [ "networkmanager" "wheel" "video"];
     packages = with pkgs; [
     #  thunderbird
-    
     ];
   };
 
@@ -116,17 +101,9 @@ programs.wayland.enable = true;
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
+  # List packages installed in system profile.
   environment.systemPackages = with pkgs; [
-  #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-  #  wget
-    #gnome-system-monitor
-    #nautilus
-    dconf-editor
-
-
-    
+    # General Applications
     vivaldi
     logseq
     albert
@@ -142,117 +119,62 @@ programs.wayland.enable = true;
     rar
     yandex-music
     solaar
-
-    grim # screenshot functionality
-    slurp # screenshot functionality
-    wl-clipboard # wl-copy and wl-paste for copy/paste from stdin / stdout
-    mako # notification system developed by swaywm maintainer
-    
-    ffmpeg
-    mpv
     epiphany
     discord
     flatpak
     git
     emacs
+
+    # Wayland/Sway specific tools (can be kept)
+    grim
+    slurp
+    wl-clipboard
+    mako
+
+    # CLI tools
+    ffmpeg
     ripgrep
     fd
-    cosmic-greeter
-    cosmic-settings
+
+    # COSMIC Packages (Good to keep for the COSMIC session)
     cosmic-session
-    cosmic-workspaces
+    cosmic-settings
     cosmic-launcher
     cosmic-notifications
     cosmic-panel
-    cosmic-term
-
     
-    
-
-
-
+    # --- ADDED: Essential packages for a good KDE Plasma experience ---
+    dolphin
+    konsole
+    spectacle
+    ark
+    kate
   ];
   
-  
   services.udev.packages = with pkgs; [
-  solaar
-];
+    solaar
+  ];
 
-services.solaar.enable = true;
-
-  # Some programs need SUID wrappers, can be configured further or are
-  # started in user sessions.
-  # programs.mtr.enable = true;
-  # programs.gnupg.agent = {
-  #   enable = true;
-  #   enableSSHSupport = true;
-  # };
-
-  # List services that you want to enable:
-
-  # Enable the OpenSSH daemon.
-  # services.openssh.enable = true;
-
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
-
-  # This value determines the NixOS release from which the default
-  # settings for stateful data, like file locations and database versions
-  # on your system were taken. It‘s perfectly fine and recommended to leave
-  # this value at the release version of the first install of this system.
-  # Before changing this value read the documentation for this option
-  # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "25.05"; # Did you read the comment?
-  
-  #CUSTOM MINE START
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
-  
-  #nixpkgs.config.firefox.enableGnomeExtensions = true;
-  
+  # Enable GNOME Keyring (useful across desktops)
   services.gnome.gnome-keyring.enable = true;
-  # enable sway window manager
-  #programs.sway = {
-  #  enable = true;
-  #  wrapperFeatures.gtk = true;
-  #};
   
-programs.light.enable = true;
+  programs.light.enable = true;
+  security.polkit.enable = true;
 
-
-security.polkit.enable = true;
-
+  # Custom SSH Config
   programs.ssh.extraConfig = ''
-  Host github.com
+    Host github.com
       HostName github.com
       User git
       IdentitiesOnly yes
-'';
+  '';
 
+  # --- REMOVED: Deleted the insecure and non-functional root login configuration ---
 
-  # >>> START OF CHANGES FOR ROOT LOGIN <<<
-
-  # CRITICAL SECURITY WARNING: Allowing direct root graphical login is EXTREMELY DANGEROUS.
-  # Do not do this on any system that is exposed to untrusted users or networks.
-
-  # 1. Enable root login for GDM
-  # This often involves overriding GDM's default configuration which prevents root login.
-  # GDM's configuration is managed by NixOS, and we need to modify the settings that
-  # prevent root from logging in graphically.
-  # The `AllowRoot` setting in /etc/gdm/custom.conf (or similar) needs to be set to true.
-  # NixOS's declarative way to do this is via `services.xserver.displayManager.gdm.extraConfig`.
-environment.etc."gdm/custom.conf".text = pkgs.lib.mkForce ''
-  # GDM configuration for root login (Added by NixOS configuration)
-  [daemon]
-  AllowRoot=true
-
-  [security]
-  DisallowTCP=true
-'';
-
-
+  # CUSTOM MINE START
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  
+  # This value determines the NixOS release from which the default
+  # settings for stateful data were taken. It's recommended to leave this value as is.
+  system.stateVersion = "25.05"; # Did you read the comment?
 }
-
-
