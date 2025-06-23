@@ -50,7 +50,7 @@
 
   services.desktopManager = {
     cosmic.enable = true;
-    plasma.enable = true; # Added KDE Plasma
+    plasma6.enable = true; # Added KDE Plasma
   };
 
   # Configure keymap in X11
@@ -69,7 +69,6 @@
     extraPortals = [
       pkgs.xdg-desktop-portal-gtk
       pkgs.xdg-desktop-portal-gnome
-      pkgs.xdg-desktop-portal-kde # Added for KDE
     ];
     config.common.default = [ "*" ];
   };
@@ -144,11 +143,12 @@
     cosmic-panel
     
     # --- ADDED: Essential packages for a good KDE Plasma experience ---
-    dolphin
-    konsole
-    spectacle
-    ark
-    kate
+    kdePackages.dolphin
+    kdePackages.konsole
+    kdePackages.spectacle
+    kdePackages.ark
+    kdePackages.kate
+    kdePackages.xdg-desktop-portal-kde
   ];
   
   services.udev.packages = with pkgs; [
