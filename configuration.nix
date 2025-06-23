@@ -1,7 +1,3 @@
-# Edit this configuration file to define what should be installed on
-# your system.  Help is available in the configuration.nix(5) man page
-# and in the NixOS manual (accessible by running ‘nixos-help’).
-
 { config, pkgs, ... }:
 
 {
@@ -15,13 +11,6 @@
   boot.loader.efi.canTouchEfiVariables = true;
 
   networking.hostName = "nixos"; # Define your hostname.
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-
-  # Configure network proxy if necessary
-  # networking.proxy.default = "http://user:password@proxy:port/";
-  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
-
-  # Enable networking
   networking.networkmanager.enable = true;
 
   # Set your time zone.
@@ -29,7 +18,6 @@
 
   # Select internationalisation properties.
   i18n.defaultLocale = "en_IN";
-
   i18n.extraLocaleSettings = {
     LC_ADDRESS = "en_IN";
     LC_IDENTIFICATION = "en_IN";
@@ -45,13 +33,16 @@
   # Enable the X11 windowing system.
   services.xserver.enable = true;
 
-  # --- MODIFIED: Enable Plasma and use SDDM as the Display Manager ---
+  # --- Display and Desktop Managers ---
+  # Use SDDM as the single display manager.
   services.xserver.displayManager.sddm.enable = true;
+  hardware.bluetooth.enable = true;
+  # Enable the desktop environments.
+  services.desktopManager.cosmic.enable = true;
 
-  services.desktopManager = {
-    cosmic.enable = true;
-    plasma.enable = true; # Added KDE Plasma
-  };
+  # FIXED: Use the new top-level option for Plasma 6.
+  services.desktopManager.plasma6.enable = true;
+
 
   # Configure keymap in X11
   services.xserver.xkb = {
@@ -61,21 +52,20 @@
 
   # Enable CUPS to print documents.
   services.printing.enable = true;
-  services.gnome.gnome-browser-connector.enable = true; # This is fine to keep
+  services.gnome.gnome-browser-connector.enable = true;
 
-  # --- MODIFIED: Added KDE portal for better integration ---
+  # FIXED: Updated the package name for the KDE portal.
   xdg.portal = {
     enable = true;
     extraPortals = [
       pkgs.xdg-desktop-portal-gtk
       pkgs.xdg-desktop-portal-gnome
-      pkgs.xdg-desktop-portal-kde # Added for KDE
+      pkgs.kdePackages.xdg-desktop-portal-kde # Corrected package name
     ];
     config.common.default = [ "*" ];
   };
 
   # Enable sound with pipewire.
-  services.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
@@ -85,7 +75,7 @@
     #jack.enable = true;
   };
 
-  # Define a user account. Don't forget to set a password with ‘passwd’.
+  # Define a user account.
   users.users.ameen = {
     isNormalUser = true;
     description = "ameen";
@@ -125,7 +115,7 @@
     git
     emacs
 
-    # Wayland/Sway specific tools (can be kept)
+    # Wayland/Sway specific tools
     grim
     slurp
     wl-clipboard
@@ -136,28 +126,28 @@
     ripgrep
     fd
 
-    # COSMIC Packages (Good to keep for the COSMIC session)
+    # COSMIC Packages
     cosmic-session
     cosmic-settings
     cosmic-launcher
     cosmic-notifications
     cosmic-panel
-    
-    # --- ADDED: Essential packages for a good KDE Plasma experience ---
-    dolphin
-    konsole
-    spectacle
-    ark
-    kate
+
+    # Essential KDE Packages for a good experience
+    kdePackages.dolphin # File Manager
+    kdePackages.konsole # Terminal
+    kdePackages.spectacle # Screenshot Tool
+    kdePackages.ark # Archiving Tool
+    kdePackages.kate # Text Editor
   ];
-  
+
   services.udev.packages = with pkgs; [
     solaar
   ];
 
   # Enable GNOME Keyring (useful across desktops)
   services.gnome.gnome-keyring.enable = true;
-  
+
   programs.light.enable = true;
   security.polkit.enable = true;
 
@@ -169,12 +159,10 @@
       IdentitiesOnly yes
   '';
 
-  # --- REMOVED: Deleted the insecure and non-functional root login configuration ---
+  # --- REMOVED: Insecure and non-functional root login configuration ---
 
-  # CUSTOM MINE START
+  # Enable flakes
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
-  
-  # This value determines the NixOS release from which the default
-  # settings for stateful data were taken. It's recommended to leave this value as is.
-  system.stateVersion = "25.05"; # Did you read the comment?
+
+  system.stateVersion = "25.05";
 }
