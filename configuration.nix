@@ -67,8 +67,8 @@
   xdg.portal = {
     enable = true;
     extraPortals = [
-      pkgs.xdg-desktop-portal-gtk
-      pkgs.xdg-desktop-portal-gnome
+#       pkgs.xdg-desktop-portal-gtk
+#       pkgs.xdg-desktop-portal-gnome
     ];
     config.common.default = [ "*" ];
   };
@@ -96,9 +96,11 @@
 
   # Install firefox.
   programs.firefox.enable = true;
+  programs.kdeconnect.enable = true;
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
+#   programs.niri.enable = true;
 
   # List packages installed in system profile.
   environment.systemPackages = with pkgs; [
@@ -148,7 +150,70 @@
     kdePackages.spectacle
     kdePackages.ark
     kdePackages.kate
-    kdePackages.xdg-desktop-portal-kde
+    kdePackages.xdg-desktop-portal-kde # Added for KDE
+    plasma-panel-colorizer
+    plasma-panel-spacer-extended
+
+
+#       kdePackages.krecorder
+#       kdePackages.kweather
+#       kdePackages.kcharselect
+#       kdePackages.filelight
+#       kdePackages.kcalc
+#       kdePackages.kclock
+#       kdePackages.kholidays
+#       kdePackages.akonadi-calendar
+#       kdePackages.libkdepim
+#       kdePackages.kdepim-addons
+#       kdePackages.kdepim-runtime
+#       kdePackages.kcontacts
+#       libqalculate
+#       qalculate-qt
+
+#       floorp
+      kdePackages.plasma-browser-integration
+
+#       kdePackages.zanshin
+      kdePackages.korganizer
+#       kdePackages.merkuro
+#       kdePackages.francis
+
+#       lldb
+#       kdePackages.kompare
+#       kdePackages.kdevelop
+#       kdePackages.kcachegrind
+#       gcc
+#       gdb
+#       clang-tools
+#       bash-language-server
+#       nixd
+#       nixfmt
+#       marksman
+#       kdePackages.markdownpart
+#       lua
+#       lua-language-server
+#       cppcheck
+#       nixos-shell
+
+      kdePackages.qtwebengine
+      kdePackages.qtlocation
+      kdePackages.ksystemstats # needed for the resource widgets
+#       aspell # needed for spell checking
+#       aspellDicts.en
+#       aspellDicts.hu
+#       kdePackages.qtmultimedia
+      kdePackages.karousel
+
+#       gimp
+#       inkscape
+#       kdePackages.kdenlive
+#
+#       libreoffice
+#       pandoc
+#       texliveFull
+
+#       beeper
+
   ];
   
   services.udev.packages = with pkgs; [
