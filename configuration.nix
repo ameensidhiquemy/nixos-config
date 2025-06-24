@@ -23,7 +23,7 @@
 
   # Enable networking
   networking.networkmanager.enable = true;
-
+hardware.bluetooth.enable = true;
   # Set your time zone.
   time.timeZone = "Asia/Kolkata";
 
@@ -44,14 +44,21 @@
 
   # Enable the X11 windowing system.
   services.xserver.enable = true;
+  hardware.graphics.enable = true;
 
-  # --- MODIFIED: Enable Plasma and use SDDM as the Display Manager ---
-  services.xserver.displayManager.sddm.enable = true;
+services.displayManager.sddm.enable = true;
+services.displayManager.sddm.wayland.enable = true;
+services.desktopManager.plasma6.enable = true;
+# services.displayManager.defaultSession = “plasma6”;
 
-  services.desktopManager = {
-    cosmic.enable = true;
-    plasma6.enable = true; # Added KDE Plasma
-  };
+
+#   # --- MODIFIED: Enable Plasma and use SDDM as the Display Manager ---
+#   services.xserver.displayManager.sddm.enable = true;
+#
+#   services.desktopManager = {
+#     cosmic.enable = true;
+#     plasma6.enable = true; # Added KDE Plasma
+#   };
 
   # Configure keymap in X11
   services.xserver.xkb = {
@@ -153,6 +160,14 @@
     kdePackages.xdg-desktop-portal-kde # Added for KDE
     plasma-panel-colorizer
     plasma-panel-spacer-extended
+#     kdePackages.plasma-pa
+#     kdePackages.plasmatube
+    kdePackages.plasma-sdk
+    plasma-theme-switcher
+#     libsForQt5.plasma-sdk
+#     libsForQt5.plasma-nano
+    kdePackages.plasma-workspace
+
 
 
 #       kdePackages.krecorder
@@ -174,7 +189,7 @@
       kdePackages.plasma-browser-integration
 
 #       kdePackages.zanshin
-      kdePackages.korganizer
+#       kdePackages.korganizer
 #       kdePackages.merkuro
 #       kdePackages.francis
 
@@ -195,14 +210,23 @@
 #       cppcheck
 #       nixos-shell
 
-      kdePackages.qtwebengine
-      kdePackages.qtlocation
-      kdePackages.ksystemstats # needed for the resource widgets
+#       kdePackages.qtwebengine
+#       kdePackages.qtlocation
+#       kdePackages.ksystemstats # needed for the resource widgets
 #       aspell # needed for spell checking
 #       aspellDicts.en
 #       aspellDicts.hu
 #       kdePackages.qtmultimedia
       kdePackages.karousel
+            (with pkgs;
+        import ./kwin4_effect_geometry_change/kwin4_effect_geometry_change.nix {
+          inherit lib;
+          inherit stdenv;
+          inherit fetchFromGitHub;
+          kpackage = kdePackages.kpackage;
+          kwin = kdePackages.kwin;
+          inherit nodejs;
+        })
 
 #       gimp
 #       inkscape
