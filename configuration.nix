@@ -8,11 +8,15 @@
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
+#        ./flatpak.nix
     ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
+
+
+
 
   networking.hostName = "nixos"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
@@ -26,6 +30,18 @@
 hardware.bluetooth.enable = true;
   # Set your time zone.
   time.timeZone = "Asia/Kolkata";
+
+
+
+  qt = {
+    enable = true;
+    platformTheme = "kde"; # use QT settings from Plasma
+  };
+#   environment.variables = {
+#     QT_PLATFORM_PLUGIN_PATH = "${pkgs.qt5.qtbase}/lib/qt-5/plugins/platforms";
+#     QT_QPA_PLATFORMTHEME = "qt5ct";
+#   };
+
 
   # Select internationalisation properties.
   i18n.defaultLocale = "en_IN";
@@ -42,8 +58,12 @@ hardware.bluetooth.enable = true;
     LC_TIME = "en_IN";
   };
 
-  # Enable the X11 windowing system.
+    #graphics
+  boot.initrd.kernelModules = [ "amdgpu" ];
   services.xserver.enable = true;
+services.xserver.videoDrivers = [ "amdgpu" ];
+  # Enable the X11 windowing system.
+#   services.xserver.enable = true;
   hardware.graphics.enable = true;
 
 services.displayManager.sddm.enable = true;
@@ -65,20 +85,21 @@ services.desktopManager.plasma6.enable = true;
     layout = "us";
     variant = "";
   };
+#   services.flatpak.enable = true;
 
   # Enable CUPS to print documents.
   services.printing.enable = true;
-  services.gnome.gnome-browser-connector.enable = true; # This is fine to keep
+#   services.gnome.gnome-browser-connector.enable = true; # This is fine to keep
 
-  # --- MODIFIED: Added KDE portal for better integration ---
-  xdg.portal = {
-    enable = true;
-    extraPortals = [
-#       pkgs.xdg-desktop-portal-gtk
-#       pkgs.xdg-desktop-portal-gnome
-    ];
-    config.common.default = [ "*" ];
-  };
+#   # --- MODIFIED: Added KDE portal for better integration ---
+#   xdg.portal = {
+#     enable = true;
+#     extraPortals = [
+# #       pkgs.xdg-desktop-portal-gtk
+# #       pkgs.xdg-desktop-portal-gnome
+#     ];
+#     config.common.default = [ "*" ];
+#   };
 
   # Enable sound with pipewire.
   services.pulseaudio.enable = false;
@@ -109,9 +130,27 @@ services.desktopManager.plasma6.enable = true;
   nixpkgs.config.allowUnfree = true;
 #   programs.niri.enable = true;
 
+
+#NUR PACKAGES: You can find all packages using Packages search for NUR or search our nur-combined repository,
+#which contains all nix expressions from all users, via github.
+  nixpkgs.config.packageOverrides = pkgs: {
+    nur = import (builtins.fetchTarball "https://github.com/nix-community/NUR/archive/main.tar.gz") {
+      inherit pkgs;
+    };
+  };
+
+# then in configuration.nix
+#environment.systemPackages = with pkgs; [
+#  nur.repos.mic92.hello-nur
+#];
+
+
+
+
   # List packages installed in system profile.
   environment.systemPackages = with pkgs; [
     # General Applications
+    nodejs
     vivaldi
     logseq
     albert
@@ -129,9 +168,24 @@ services.desktopManager.plasma6.enable = true;
     solaar
     epiphany
     discord
-    flatpak
     git
     emacs
+    catppuccin-kde
+    pkgs.libsForQt5.qt5ct
+    pkgs.libsForQt5.qtstyleplugin-kvantum
+    pkgs.arc-kde-theme          # Example: Arc Dark theme
+gruvbox-kvantum
+gruvbox-plus-icons
+kde-gruvbox
+kdePackages.koi
+kdePackages.kalm
+kdePackages.yakuake
+papirus-icon-theme
+kde-rounded-corners
+      krita
+
+    gruvbox-gtk-theme
+
 
     # Wayland/Sway specific tools (can be kept)
     grim
@@ -167,6 +221,33 @@ services.desktopManager.plasma6.enable = true;
 #     libsForQt5.plasma-sdk
 #     libsForQt5.plasma-nano
     kdePackages.plasma-workspace
+    cassette
+konsave
+capitaine-cursors-themed
+plasma-applet-commandoutput
+    kdePackages.packagekit-qt
+    kdePackages.qtstyleplugin-kvantum
+        qt6.qtwebsockets
+    qt6.qtwebengine
+    kdePackages.dolphin-plugins
+    kdePackages.qtwayland
+    plasmusic-toolbar
+        kdePackages.plasmatube
+    kdePackages.kalk
+    kdePackages.discover
+    kdePackages.kdeconnect-kde
+    kdePackages.kpat
+        kdePackages.kcolorchooser
+            kdePackages.kteatime
+    kdePackages.kbounce
+        kdePackages.wallpaper-engine-plugin
+        kdePackages.sddm-kcm
+        kdePackages.kanagram
+        kdePackages.kcolorscheme
+
+
+
+
 
 
 
@@ -189,13 +270,13 @@ services.desktopManager.plasma6.enable = true;
       kdePackages.plasma-browser-integration
 
 #       kdePackages.zanshin
-#       kdePackages.korganizer
+      kdePackages.korganizer
 #       kdePackages.merkuro
 #       kdePackages.francis
 
 #       lldb
-#       kdePackages.kompare
-#       kdePackages.kdevelop
+      kdePackages.kompare
+      kdePackages.kdevelop
 #       kdePackages.kcachegrind
 #       gcc
 #       gdb
@@ -208,10 +289,10 @@ services.desktopManager.plasma6.enable = true;
 #       lua
 #       lua-language-server
 #       cppcheck
-#       nixos-shell
+      nixos-shell
 
-#       kdePackages.qtwebengine
-#       kdePackages.qtlocation
+      kdePackages.qtwebengine
+      kdePackages.qtlocation
 #       kdePackages.ksystemstats # needed for the resource widgets
 #       aspell # needed for spell checking
 #       aspellDicts.en
