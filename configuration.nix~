@@ -204,7 +204,6 @@ kdePackages.yakuake
 papirus-icon-theme
 kde-rounded-corners
       krita
-      nautilus
 
     gruvbox-gtk-theme
 nixfmt-rfc-style
